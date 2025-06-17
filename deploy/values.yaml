@@ -49,3 +49,8 @@ master:
 replica:
   activeReplica: true
   replicaCount: 0
+
+#  kubectl port-forward pod/internal-configuration-kvstore-master-0 63790:6379 -n testing-dev
+#  kubectl port-forward pod/internal-configuration-kvstore-master-1 63791:6379 -n testing-dev
+#  kubectl port-forward pod/internal-configuration-kvstore-master-2 63792:6379 -n testing-dev
+#  kubectl port-forward pod/internal-configuration-kvstore-master-3 63793:6379 -n testing-dev
