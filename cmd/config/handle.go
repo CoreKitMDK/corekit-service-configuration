@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -16,6 +17,8 @@ var (
 )
 
 func Handle(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+
 	key := r.URL.Query().Get("key")
 	if key == "" {
 		http.Error(w, "missing key parameter", http.StatusBadRequest)
@@ -29,5 +32,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprint(w, val)
+
+	elapsed := time.Since(start).Milliseconds()
+	fmt.Fprintf(w, "%s (took %dms)", val, elapsed)
 }
