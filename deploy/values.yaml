@@ -1,0 +1,51 @@
+# https://raw.githubusercontent.com/bitnami/charts/refs/heads/main/bitnami/keydb/values.yaml
+
+nameOverride: internal-configuration-kvstore
+fullnameOverride: internal-configuration-kvstore
+
+auth:
+  enabled: false
+
+tls:
+  enabled: false
+
+architecture: replication
+
+commonConfiguration: |-
+  multi-master yes
+  active-replica yes
+  replicaof internal-configuration-kvstore-master-1.internal-configuration-kvstore-master-hl.testing-dev.svc.cluster.local 6379
+  replicaof internal-configuration-kvstore-master-3.internal-configuration-kvstore-master-hl.testing-dev.svc.cluster.local 6379
+  replicaof internal-configuration-kvstore-master-0.internal-configuration-kvstore-master-hl.testing-dev.svc.cluster.local 6379
+  replicaof internal-configuration-kvstore-master-2.internal-configuration-kvstore-master-hl.testing-dev.svc.cluster.local 6379
+
+# replicaof points to headless DNS names
+#  kubectl get endpoints internal-configuration-kvstore-master-hl -n testing-dev \
+#  -o jsonpath='{.subsets[*].addresses[*].hostname}' | tr ' ' '\n' \
+#  | sed 's/$/.internal-configuration-kvstore-master-hl.testing-dev.svc.cluster.local/'
+
+master:
+  ## @param master.replicaCount Number of KeyDB master replicas to deploy
+  replicaCount: 4
+  containerPorts:
+    keydb: 6379
+
+  persistence:
+    enabled: true
+    storageClass: "nfs-rwx"
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+# 0 replicas cuz master-master replication
+replica:
+  activeReplica: true
+  replicaCount: 0
