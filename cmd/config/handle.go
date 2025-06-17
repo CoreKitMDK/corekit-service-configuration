@@ -1,26 +1,33 @@
 package function
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
+
+	"github.com/go-redis/redis/v8"
 )
 
-// Handle an HTTP Request.
-func Handle(w http.ResponseWriter, r *http.Request) {
-	/* test
-	 * YOUR CODE HERE
-	 *
-	 * Try running `go test`.  Add more test as you code in `handle_test.go`.
-	 */
+var (
+	ctx = context.Background()
+	rdb = redis.NewClient(&redis.Options{
+		Addr: "internal-configuration-kvstore-master:6379",
+	})
+)
 
-	dump, err := httputil.DumpRequest(r, true)
-	if err != nil {
+func Handle(w http.ResponseWriter, r *http.Request) {
+	key := r.URL.Query().Get("key")
+	if key == "" {
+		http.Error(w, "missing key parameter", http.StatusBadRequest)
+		return
+	}
+	val, err := rdb.Get(ctx, key).Result()
+	if err == redis.Nil {
+		http.Error(w, "key not found", http.StatusNotFound)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println("Received request")
-	fmt.Printf("%q\n", dump)
-	fmt.Fprintf(w, "%q", dump)
+	fmt.Fprint(w, val)
 }
