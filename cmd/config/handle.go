@@ -30,7 +30,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	if key == "" {
 		caller := r.Header.Get("Caller")
 		Logger.Log(logger.DEBUG, "Key not found : "+key+" for caller : "+caller)
-		http.Error(w, "missing key parameter", http.StatusBadRequest)
+		http.Error(w, "missing key parameter in query string", http.StatusBadRequest)
 		return
 	}
 
