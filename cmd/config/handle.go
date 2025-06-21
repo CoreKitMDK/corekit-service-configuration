@@ -46,4 +46,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 
 	elapsed := time.Since(start).Milliseconds()
 	fmt.Fprintf(w, "Got key : %s (took %dms)", val, elapsed)
+
+	time.Sleep(2 * time.Second)
 }
