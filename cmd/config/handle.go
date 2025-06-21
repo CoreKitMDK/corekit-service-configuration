@@ -10,7 +10,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-var config_config_json = "{\"use_console\":true,\"use_nats\":true,\"nats_url\":\"nats://localhost:4222\",\"nats_username\":\"internal-logger-broker\",\"nats_password\":\"internal-logger-broker\"}"
+var config_config_json = "{\"use_console\":true,\"use_nats\":true,\"nats_url\":\"nats://internal-logger-broker-nats:4222\",\"nats_username\":\"internal-logger-broker\",\"nats_password\":\"internal-logger-broker\"}"
 
 var Logger_config, _ = logger.FromJsonString(config_config_json)
 var Logger = Logger_config.Init()
@@ -28,14 +28,15 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 
 	key := r.URL.Query().Get("key")
 	if key == "" {
+		caller := r.Header.Get("Caller")
+		Logger.Log(logger.DEBUG, "Key not found : "+key+" for caller : "+caller)
 		http.Error(w, "missing key parameter", http.StatusBadRequest)
 		return
 	}
 
-	Logger.Log(logger.DEBUG, "Got request for key : "+key)
-
 	val, err := rdb.Get(ctx, key).Result()
 	if err == redis.Nil {
+
 		http.Error(w, "key not found", http.StatusNotFound)
 		return
 	} else if err != nil {
