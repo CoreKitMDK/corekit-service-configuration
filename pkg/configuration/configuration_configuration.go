@@ -11,8 +11,9 @@ type Configuration struct {
 	UseConfigString bool   `json:"use_config_string"`
 	ConfigString    string `json:"config_string"`
 
-	UseApi bool   `json:"use_api"`
-	ApiUrl string `json:"api_url"`
+	UseApi       bool   `json:"use_api"`
+	ApiUrl       string `json:"api_url"`
+	ApiNamespace string `json:"api_namespace"`
 }
 
 func NewConfiguration() *Configuration {
@@ -28,16 +29,12 @@ func FromJsonString(jsonString string) (*Configuration, error) {
 	return &config, nil
 }
 
-func (c *Configuration) Init() *IConfiguration {
-	var config *IConfiguration = nil
-
+func (c *Configuration) Init() IConfiguration {
 	if c.UseApi {
 		if c.ApiUrl != "" {
-			api := NewAPI(c.ApiUrl)
-			iconfig := IConfiguration(api)
-			config = &iconfig
+			return NewAPI(c.ApiUrl, c.ApiNamespace)
 		}
 	}
 
-	return config
+	return nil
 }
