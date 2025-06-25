@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 // TestHandle ensures that Handle executes without error and returns the
@@ -29,4 +30,6 @@ func TestHandle(t *testing.T) {
 	if res.StatusCode != 200 {
 		t.Fatalf("unexpected response code: %v", res.StatusCode)
 	}
+
+	time.Sleep(5 * time.Second)
 }
